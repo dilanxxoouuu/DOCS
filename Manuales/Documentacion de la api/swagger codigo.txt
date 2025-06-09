@@ -1,0 +1,721 @@
+openapi: 3.0.4
+info:
+  title: phphone - E-commerce de Dispositivos Móviles y Accesorios
+  description: |-
+    phphone es una plataforma de e-commerce que permite la venta y administración de dispositivos móviles y accesorios. La API permite interactuar con el sistema para gestionar productos, usuarios, pagos y órdenes, entre otros.
+  termsOfService: https://phphone.com/terms
+  contact:
+    email: support@phphone.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+externalDocs:
+  description: Encuentra más sobre la API en nuestro sitio web
+  url: https://phphone.com/api/docs
+servers:
+  - url: https://api.phphone.com/v1
+    description: Servidor principal de la API
+tags:
+  - name: productos
+    description: Gestión de dispositivos móviles y accesorios
+  - name: usuarios
+    description: Administración de usuarios y autenticación
+  - name: pagos
+    description: Gestión de pagos y órdenes
+  - name: administracion
+    description: Administración de recursos del e-commerce
+  - name: facturas
+    description: Gestión de facturas
+  - name: detallefactura
+    description: Gestión de detalles de facturas
+  - name: envios
+    description: Gestión de envíos
+
+paths:
+  /productos:
+    get:
+      summary: Obtener todos los productos
+      tags:
+        - productos
+      responses:
+        200:
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Producto'
+      responses:
+        201:
+          description: Producto creado
+
+  /productos/{id}:
+    get:
+      summary: Obtener un producto por ID
+      tags:
+        - productos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+    put:
+      summary: Actualizar un producto
+      tags:
+        - productos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Producto'
+      responses:
+        200:
+          description: Producto actualizado
+    delete:
+      summary: Eliminar un producto
+      tags:
+        - productos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Producto eliminado
+
+  /usuarios:
+    post:
+      summary: Crear un nuevo usuario
+      tags:
+        - usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        201:
+          description: Usuario creado
+
+  /login:
+    post:
+      summary: Login de usuario
+      tags:
+        - usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        200:
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /carritos:
+    get:
+      summary: Obtener carritos
+      tags:
+        - administracion
+      responses:
+        200:
+          description: Lista de carritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Carrito'
+    post:
+      summary: Crear un carrito
+      tags:
+        - administracion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Carrito'
+      responses:
+        201:
+          description: Carrito creado
+
+  /carritos/{id}:
+    get:
+      summary: Obtener carrito por ID
+      tags:
+        - administracion
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrito'
+
+  /ordenes:
+    post:
+      summary: Crear una orden
+      tags:
+        - pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Orden'
+      responses:
+        201:
+          description: Orden creada
+
+  /pagos:
+    post:
+      summary: Registrar un pago
+      tags:
+        - pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pago'
+      responses:
+        201:
+          description: Pago registrado
+
+  /pagos/tarjeta:
+    post:
+      summary: Pagar con tarjeta
+      tags:
+        - pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tarjeta'
+      responses:
+        201:
+          description: Pago con tarjeta exitoso
+
+  /pagos/transferencia:
+    post:
+      summary: Pagar con transferencia
+      tags:
+        - pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transferencia'
+      responses:
+        201:
+          description: Pago por transferencia registrado
+
+  /pagos/paypal:
+    post:
+      summary: Pagar con PayPal
+      tags:
+        - pagos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Paypal'
+      responses:
+        201:
+          description: Pago con PayPal registrado
+
+  /facturas:
+    post:
+      summary: Crear una factura y enviar por correo electrónico
+      tags:
+        - facturas
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_pago:
+                  type: integer
+                  description: ID del pago a partir del cual se generará la factura
+              required:
+                - id_pago
+      responses:
+        '201':
+          description: Factura creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id_factura:
+                    type: integer
+                  factura_fecha:
+                    type: string
+                  total:
+                    type: string
+        '400':
+          description: Error en la solicitud (faltan datos)
+        '404':
+          description: Recurso no encontrado (pago, carrito o usuario)
+        '500':
+          description: Error interno del servidor
+    get:
+      summary: Obtener todas las facturas
+      tags:
+        - facturas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de facturas existentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_factura:
+                      type: integer
+                    id_pago:
+                      type: integer
+                    factura_fecha:
+                      type: string
+
+  /detalles-factura:
+    get:
+      summary: Obtener todos los detalles de las facturas
+      tags:
+        - detallefactura
+      responses:
+        200:
+          description: Lista de detalles de factura
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DetalleFactura'
+    post:
+      summary: Crear un nuevo detalle de factura
+      tags:
+        - detallefactura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetalleFactura'
+      responses:
+        201:
+          description: Detalle de factura creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetalleFacturaResponse'
+        400:
+          description: Error de validación o datos faltantes
+        500:
+          description: Error interno del servidor
+  /envios:
+    post:
+      tags:
+        - Envio
+      summary: Crear un nuevo envío y una orden asociada
+      description: >
+        Crea un nuevo registro de envío para el usuario autenticado. Este proceso también genera automáticamente una orden vinculada a la factura más reciente del usuario.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Envio'
+      responses:
+        '201':
+          description: Datos de envío y orden guardados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: Datos de envío y orden guardados exitosamente
+                  envio:
+                    $ref: '#/components/schemas/EnvioResponse'
+                  orden:
+                    type: object
+                    properties:
+                      id_orden:
+                        type: integer
+                      id_factura:
+                        type: integer
+                      monto_total:
+                        type: string
+                      estado:
+                        type: string
+                      fecha_orden:
+                        type: string
+                        format: date-time
+        '400':
+          description: Error de validación o datos faltantes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: No se encontró una factura reciente para el usuario
+        '500':
+          description: Error interno del servidor
+
+
+components:
+  schemas:
+
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+          format: float
+        cantidad:
+          type: integer
+
+    Usuario:
+      type: object
+      properties:
+        id_usuario:
+          type: integer
+        nombre:
+          type: string
+        correo:
+          type: string
+        contrasena:
+          type: string
+
+    Login:
+      type: object
+      properties:
+        correo:
+          type: string
+        contrasena:
+          type: string
+
+    Orden:
+      type: object
+      properties:
+        id:
+          type: integer
+        usuarioId:
+          type: integer
+        productos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
+        total:
+          type: number
+          format: float
+        estado:
+          type: string
+          enum: [pendiente, pagado, enviado]
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+
+    Carrito:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_usuario:
+          type: integer
+        total:
+          type: number
+          format: float
+        fecha:
+          type: string
+          format: date-time
+        procesado:
+          type: boolean
+      required:
+        - id_usuario
+        - total
+        - procesado
+
+    CarritoProducto:
+      type: object
+      properties:
+        id_carrito:
+          type: integer
+        id_producto:
+          type: integer
+        cantidad:
+          type: integer
+      required:
+        - id_carrito
+        - id_producto
+        - cantidad
+
+    Pago:
+      type: object
+      properties:
+        id_pago:
+          type: integer
+        id_carrito:
+          type: integer
+        fecha_pago:
+          type: string
+          format: date-time
+        monto:
+          type: number
+          format: float
+        metodo_pago:
+          type: string
+        estado:
+          type: string
+      required:
+        - id_carrito
+        - fecha_pago
+        - monto
+        - metodo_pago
+        - estado
+
+    Tarjeta:
+      type: object
+      required:
+        - id_pago
+        - nombre_en_tarjeta
+        - numero_tarjeta
+        - fecha_expiracion
+        - cvv
+      properties:
+        id_pago:
+          type: integer
+        nombre_en_tarjeta:
+          type: string
+        numero_tarjeta:
+          type: string
+        fecha_expiracion:
+          type: string
+          format: date
+        cvv:
+          type: string
+
+    Transferencia:
+      type: object
+      required:
+        - id_pago
+        - nombre_titular
+        - banco_origen
+        - numero_cuenta
+      properties:
+        id_pago:
+          type: integer
+        nombre_titular:
+          type: string
+        banco_origen:
+          type: string
+        numero_cuenta:
+          type: string
+        comprobante_url:
+          type: string
+
+    Paypal:
+      type: object
+      required:
+        - id_pago
+        - email_paypal
+        - confirmacion_id
+      properties:
+        id_pago:
+          type: integer
+        email_paypal:
+          type: string
+        confirmacion_id:
+          type: string
+    Factura:
+      type: object
+      properties:
+        id_factura:
+          type: integer
+          description: ID único de la factura
+        id_pago:
+          type: integer
+          description: ID del pago asociado a esta factura
+        factura_fecha:
+          type: string
+          format: date-time
+          description: Fecha de creación de la factura
+        total:
+          type: number
+          format: float
+          description: Total de la factura
+
+    DetalleFactura:
+      type: object
+      properties:
+        id_detalle:
+          type: integer
+          description: ID único del detalle de factura
+        id_factura:
+          type: integer
+          description: ID de la factura asociada
+        id_producto:
+          type: integer
+          description: ID del producto incluido
+        cantidad:
+          type: integer
+          description: Cantidad del producto en esta factura
+        precio_unitario:
+          type: number
+          format: float
+          description: Precio por unidad del producto
+        monto_total:
+          type: number
+          format: float
+          description: Monto total (cantidad * precio_unitario)
+
+    FacturaResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Factura y detalles creados exitosamente, y correo enviado.
+        id_factura:
+          type: integer
+        factura_fecha:
+          type: string
+        total:
+          type: string
+          
+    DetalleFacturaResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Detalle de factura creado exitosamente
+        id_detalle_factura:
+          type: integer
+    Envio:
+      type: object
+      required:
+        - direccion
+        - ciudad
+        - departamento
+        - codigo_postal
+        - pais
+      properties:
+        direccion:
+          type: string
+        ciudad:
+          type: string
+        departamento:
+          type: string
+        codigo_postal:
+          type: string
+        pais:
+          type: string
+        estado_envio:
+          type: string
+          default: En camino a tu hogar
+
+    EnvioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        direccion:
+          type: string
+        ciudad:
+          type: string
+        departamento:
+          type: string
+        codigo_postal:
+          type: string
+        pais:
+          type: string
+        estado_envio:
+          type: string
+        usuario_id:
+          type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+        
+        
+        
+        
