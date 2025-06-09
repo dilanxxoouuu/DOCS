@@ -1,0 +1,41 @@
+@startuml
+skinparam linetype ortho
+skinparam node {
+    BackgroundColor #F9F9F9
+    BorderColor black
+}
+
+cloud "Internet" {
+    node "Máquina Cliente\n(Usuario final)" {
+        artifact "Navegador Web\n(React + Vite)"
+        artifact "App Flutter\n(.apk)"
+    }
+
+    node "Máquina Administrador\n(Administrador del sistema)" {
+        artifact "Panel de Administración\n(Vía navegador)"
+    }
+}
+
+node "Plataforma Vercel" {
+    node "Frontend Web" {
+        artifact "React App\n(HTML, CSS, JS)"
+    }
+}
+
+node "Plataforma Render" {
+    node "Backend Flask API" {
+        artifact "Flask App\n(Python)"
+    }
+
+    database "Base de Datos" {
+        artifact "MySQL / PostgreSQL\n(SQLAlchemy)"
+    }
+}
+
+' Conexiones
+"Navegador Web\n(React + Vite)" --> "Frontend Web"
+"App Flutter\n(.apk)" --> "Backend Flask API"
+"Panel de Administración\n(Vía navegador)" --> "Frontend Web"
+"Frontend Web" --> "Backend Flask API"
+"Backend Flask API" --> "Base de Datos"
+@enduml
